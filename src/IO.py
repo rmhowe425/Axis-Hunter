@@ -141,11 +141,29 @@ class IO(Command):
         -------
         msg : str
             Formatted Axis CGI response body.
-        """
-        deactivate_endpoint = '/axis-cgi/io/lightcontrol.cgi?action=L1:0'
 
-        # Attempt to turn on floodlight.
-        resp = self.make_network_call(endpoint=deactivate_endpoint)
+        Notes
+        -----
+        Floodlight uses pulse width modulation. Brightness of the floodlight can be controlled
+        by passing values ranging from [-100, 100] with 100 being the largest (brightest) value.
+
+        Positive values passed to the CGI endpoint result in the brightness of the light being immediately changed.
+        Negative values passed to the CGI endpoint result in the brightness of the light being gradually changed.
+
+        Examples
+        --------
+        /axis-cgi/io/lightcontrol.cgi?action=L1:0: Light is immediately turned off.
+        /axis-cgi/io/lightcontrol.cgi?action=L1:-0: Light is gradually turned off.
+        /axis-cgi/io/lightcontrol.cgi?action=L1:50: Light is immediately configured to half brightness.
+        /axis-cgi/io/lightcontrol.cgi?action=L1:-50: Light is gradually configured to half brightness.
+        /axis-cgi/io/lightcontrol.cgi?action=L1:100: Light is immediately configured to full brightness.
+        /axis-cgi/io/lightcontrol.cgi?action=L1:-100: Light is gradually configured to full brightness.
+        """
+        endpoint = '/axis-cgi/io/lightcontrol.cgi'
+        params = {'action': 'L1:0'}
+
+        # Attempt to configure floodlight.
+        resp = self.make_network_call(endpoint=endpoint, params=params)
 
         if resp.status_code == 401:
             msg = 'Unable to activate flood light. Access Denied.\n'
